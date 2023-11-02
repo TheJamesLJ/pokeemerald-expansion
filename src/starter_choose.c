@@ -25,6 +25,7 @@
 #include "constants/rgb.h"
 
 #define STARTER_MON_COUNT   3
+#define TOTAL_POKE_GENERATIONS 8
 
 // Position of the sprite of the selected starter Pokemon
 #define STARTER_PKMN_POS_X (DISPLAY_WIDTH / 2)
@@ -116,6 +117,20 @@ static const u16 sStarterMon[STARTER_MON_COUNT] =
     SPECIES_TORCHIC,
     SPECIES_MUDKIP,
 };
+
+static const u16 sGenSpecificStarterMon[TOTAL_POKE_GENERATIONS][STARTER_MON_COUNT] =
+{
+    {SPECIES_BULBASAUR, SPECIES_CHARMANDER, SPECIES_SQUIRTLE},
+    {SPECIES_CHIKORITA, SPECIES_CYNDAQUIL, SPECIES_TOTODILE},
+    {SPECIES_TREECKO, SPECIES_TORCHIC, SPECIES_MUDKIP},
+    {SPECIES_TURTWIG, SPECIES_CHIMCHAR, SPECIES_PIPLUP},
+    {SPECIES_SNIVY, SPECIES_TEPIG, SPECIES_OSHAWOTT},
+    {SPECIES_CHESPIN, SPECIES_FENNEKIN, SPECIES_FROAKIE},
+    {SPECIES_ROWLET, SPECIES_LITTEN, SPECIES_POPPLIO},
+    {SPECIES_GROOKEY, SPECIES_SCORBUNNY, SPECIES_SOBBLE},
+};
+
+
 
 static const struct BgTemplate sBgTemplates[3] =
 {
@@ -352,7 +367,8 @@ u16 GetStarterPokemon(u16 chosenStarterId)
 {
     if (chosenStarterId > STARTER_MON_COUNT)
         chosenStarterId = 0;
-    return sStarterMon[chosenStarterId];
+    return sGenSpecificStarterMon[VarGet(VAR_STARTER_GEN_SELECTED)][chosenStarterId];
+    //return sStarterMon[chosenStarterId];
 }
 
 static void VblankCB_StarterChoose(void)

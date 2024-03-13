@@ -1767,6 +1767,12 @@
 	_dynmultichoice \left, \top, \ignoreBPress, \maxBeforeScroll, \shouldSort, \initialSelected, \callbacks, NULL
 	.endm
 
+	@ Checks to see if the player has a Pokemon in their party. Result returns to VAR_RESULT
+    .macro checkpartymon level:req
+    .byte 0xe5
+    .2byte \level
+    .endm
+
 
 @ Supplementary
 

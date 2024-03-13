@@ -204,6 +204,7 @@ void NewGameInitData(void)
     WipeTrainerNameRecords();
     ResetTrainerHillResults();
     ResetContestLinkResults();
+    gSaveBlock1Ptr->vars[VAR_STARTER_GEN_SELECTED - VARS_START] = 2;
 }
 
 static void ResetMiniGamesRecords(void)

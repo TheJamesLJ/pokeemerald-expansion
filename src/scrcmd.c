@@ -1390,7 +1390,7 @@ bool8 ScrCmd_dynmultichoice(struct ScriptContext *ctx)
     struct ListMenuItem *items;
 
     if (argc == 0)
-        return;
+        return FALSE;
 
     if (maxBeforeScroll == 0xFF)
         maxBeforeScroll = DYN_MULTICHOICE_DEFAULT_MAX_BEFORE_SCROLL;
@@ -1446,6 +1446,7 @@ bool8 ScrCmd_dynmultipush(struct ScriptContext *ctx)
     item.name = nameBuffer;
     item.id = id;
     MultichoiceDynamic_PushElement(item);
+    return FALSE;
 }
 
 bool8 ScrCmd_multichoice(struct ScriptContext *ctx)
@@ -2420,4 +2421,24 @@ bool8 ScrCmd_warpwhitefade(struct ScriptContext *ctx)
     DoWhiteFadeWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
+}
+
+bool8 ScrCmd_checkpartymon(struct ScriptContext *ctx)
+{
+    u16 speciesLook = VarGet(ScriptReadHalfword(ctx));
+
+    gSpecialVar_Result = PARTY_SIZE;
+    struct Pokemon *pokemon = &gPlayerParty[gSpecialVar_0x8004];
+    if (GetMonData(pokemon, MON_DATA_LEVEL) == 100) 
+    {
+        gSpecialVar_Result = TRUE;
+        return TRUE;
+    }
+    else
+    {
+        gSpecialVar_Result = FALSE;
+        return FALSE;
+    }
+
+    return FALSE;
 }

@@ -444,6 +444,59 @@ static void DrawMultichoiceMenu(u8 left, u8 top, u8 multichoiceId, bool8 ignoreB
     DrawMultichoiceMenuInternal(left, top, multichoiceId, ignoreBPress, cursorPos, sMultichoiceLists[multichoiceId].list, sMultichoiceLists[multichoiceId].count);
 }
 
+static void Task_HandleScrollingMultichoiceInput(u8 taskId)
+{
+    bool32 done = FALSE;
+    s32 input = ListMenu_ProcessInput(gTasks[taskId].data[0]);
+
+    switch (input)
+    {
+    case LIST_HEADER:
+    case LIST_NOTHING_CHOSEN:
+        break;
+    case LIST_CANCEL:
+        if (!gTasks[taskId].data[1])
+        {
+            gSpecialVar_Result = MULTI_B_PRESSED;
+            done = TRUE;
+        }
+        break;
+    default:
+        gSpecialVar_Result = input;
+        done = TRUE;
+        break;
+    }
+
+    if (done)
+    {
+        struct ListMenuItem *items;
+
+        PlaySE(SE_SELECT);
+
+        if (sDynamicMenuEventId != DYN_MULTICHOICE_CB_NONE && sDynamicListMenuEventCollections[sDynamicMenuEventId].OnDestroy)
+        {
+            struct DynamicListMenuEventArgs eventArgs = {.selectedItem = input, .windowId = gTasks[taskId].data[2], .list = NULL};
+            sDynamicListMenuEventCollections[sDynamicMenuEventId].OnDestroy(&eventArgs);
+        }
+
+        sDynamicMenuEventId = DYN_MULTICHOICE_CB_NONE;
+
+        if (gTasks[taskId].data[5] > gTasks[taskId].data[7])
+        {
+            RemoveScrollIndicatorArrowPair(gTasks[taskId].data[6]);
+        }
+
+        LoadWordFromTwoHalfwords((u16*) &gTasks[taskId].data[3], (u32* )(&items));
+        FreeListMenuItems(items, gTasks[taskId].data[5]);
+        TRY_FREE_AND_SET_NULL(sDynamicMenuEventScratchPad);
+        DestroyListMenuTask(gTasks[taskId].data[0], NULL, NULL);
+        ClearStdWindowAndFrame(gTasks[taskId].data[2], TRUE);
+        RemoveWindow(gTasks[taskId].data[2]);
+        ScriptContext_Enable();
+        DestroyTask(taskId);
+    }
+}
+
 #define tLeft           data[0]
 #define tTop            data[1]
 #define tRight          data[2]

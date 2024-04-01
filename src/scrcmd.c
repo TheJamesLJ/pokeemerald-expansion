@@ -1180,7 +1180,7 @@ bool8 ScrCmd_setobjectmovementtype(struct ScriptContext *ctx)
 
 bool8 ScrCmd_createvobject(struct ScriptContext *ctx)
 {
-    u8 graphicsId = ScriptReadByte(ctx);
+    u16 graphicsId = ScriptReadHalfword(ctx);
     u8 virtualObjId = ScriptReadByte(ctx);
     u16 x = VarGet(ScriptReadHalfword(ctx));
     u32 y = VarGet(ScriptReadHalfword(ctx));
@@ -2408,4 +2408,24 @@ bool8 ScrCmd_warpwhitefade(struct ScriptContext *ctx)
     DoWhiteFadeWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
+}
+
+bool8 ScrCmd_checkpartymon(struct ScriptContext *ctx)
+{
+    u16 speciesLook = VarGet(ScriptReadHalfword(ctx));
+
+    gSpecialVar_Result = PARTY_SIZE;
+    struct Pokemon *pokemon = &gPlayerParty[gSpecialVar_0x8004];
+    if (GetMonData(pokemon, MON_DATA_LEVEL) == 100) 
+    {
+        gSpecialVar_Result = TRUE;
+        return TRUE;
+    }
+    else
+    {
+        gSpecialVar_Result = FALSE;
+        return FALSE;
+    }
+
+    return FALSE;
 }

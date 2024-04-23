@@ -317,7 +317,16 @@ static const s32 sExperienceScalingFactors[] =
 
 static const u16 sTrappingMoves[NUM_TRAPPING_MOVES] =
 {
-    MOVE_BIND, MOVE_WRAP, MOVE_FIRE_SPIN, MOVE_CLAMP, MOVE_WHIRLPOOL, MOVE_SAND_TOMB, MOVE_MAGMA_STORM, MOVE_INFESTATION, MOVE_SNAP_TRAP,
+    MOVE_BIND,
+    MOVE_WRAP,
+    MOVE_FIRE_SPIN,
+    MOVE_CLAMP,
+    MOVE_WHIRLPOOL,
+    MOVE_SAND_TOMB,
+    MOVE_MAGMA_STORM,
+    MOVE_INFESTATION,
+    MOVE_SNAP_TRAP,
+    MOVE_THUNDER_CAGE
 };
 
 static const u16 sBadgeFlags[8] = {
@@ -9585,20 +9594,6 @@ static void Cmd_various(void)
         gLastUsedAbility = gBattleMons[battler].ability;
         break;
     }
-    case VARIOUS_TRY_QUASH:
-    {
-        VARIOUS_ARGS(const u8 *failInstr);
-        if (GetBattlerTurnOrderNum(gBattlerAttacker) > GetBattlerTurnOrderNum(gBattlerTarget)) // It's true if foe is faster, has a bigger priority, or switches
-        {
-            gBattlescriptCurrInstr = cmd->failInstr; // This replaces the current battlescript with the "fail" script.
-        }
-        else // If the condition is not true, it means we are faster than the foe, so we can set the quash bit
-        {
-            gProtectStructs[gBattlerTarget].quash = TRUE;
-            gBattlescriptCurrInstr = cmd->nextInstr; // and then we proceed with the rest of our battlescript
-        }
-        return;
-    }
     case VARIOUS_INVERT_STAT_STAGES:
     {
         VARIOUS_ARGS();
@@ -10391,6 +10386,7 @@ static void Cmd_various(void)
         if (cmd->fromBattler)
             gLastUsedItem = gBattleMons[battler].item;
 
+        gBattleStruct->ateBerry[battler & BIT_SIDE] |= gBitTable[gBattlerPartyIndexes[battler]];
         gBattleScripting.battler = gEffectBattler = gBattlerTarget = battler;    // Cover all berry effect battler cases. e.g. ChangeStatBuffs uses target ID
         if (ItemBattleEffects(ITEMEFFECT_USE_LAST_ITEM, battler, FALSE))
             return;
@@ -13708,7 +13704,8 @@ static void Cmd_trysetfutureattack(void)
     {
         gSideStatuses[GetBattlerSide(gBattlerTarget)] |= SIDE_STATUS_FUTUREATTACK;
         gWishFutureKnock.futureSightMove[gBattlerTarget] = gCurrentMove;
-        gWishFutureKnock.futureSightAttacker[gBattlerTarget] = gBattlerAttacker;
+        gWishFutureKnock.futureSightBattlerIndex[gBattlerTarget] = gBattlerAttacker;
+        gWishFutureKnock.futureSightPartyIndex[gBattlerTarget] = gBattlerPartyIndexes[gBattlerAttacker];
         gWishFutureKnock.futureSightCounter[gBattlerTarget] = 3;
 
         if (gCurrentMove == MOVE_DOOM_DESIRE)
@@ -16823,4 +16820,50 @@ void BS_TryTidyUp(void)
         else
             gBattlescriptCurrInstr = cmd->nextInstr;
     }
+}
+
+void BS_TryGulpMissile(void)
+{
+    NATIVE_ARGS();
+
+    if ((gBattleMons[gBattlerAttacker].species == SPECIES_CRAMORANT)
+     && (gCurrentMove == MOVE_DIVE)
+     && (GetBattlerAbility(gBattlerAttacker) == ABILITY_GULP_MISSILE)
+     && TryBattleFormChange(gBattlerAttacker, FORM_CHANGE_BATTLE_HP_PERCENT))
+        gBattlescriptCurrInstr = BattleScript_GulpMissileFormChange;
+    else
+        gBattlescriptCurrInstr = cmd->nextInstr;
+}
+
+
+void BS_TryQuash(void)
+{
+    NATIVE_ARGS(const u8 *failInstr);
+    u32 i;
+
+    // It's true if foe is faster, has a bigger priority, or switches
+    if (GetBattlerTurnOrderNum(gBattlerAttacker) > GetBattlerTurnOrderNum(gBattlerTarget))
+    {
+        gBattlescriptCurrInstr = cmd->failInstr;
+        return;
+    }
+
+    // If the above condition is not true, it means we are faster than the foe, so we can set the quash bit
+    gProtectStructs[gBattlerTarget].quash = TRUE;
+    for (i = 0; i < gBattlersCount; i++)
+    {
+        gBattlerByTurnOrder[i] = i;
+    }
+    for (i = 0; i < gBattlersCount - 1; i++)
+    {
+        s32 j;
+        for (j = i + 1; j < gBattlersCount; j++)
+        {
+            if (!gProtectStructs[i].quash
+             && !gProtectStructs[j].quash
+             && GetWhichBattlerFaster(gBattlerByTurnOrder[i], gBattlerByTurnOrder[j], FALSE) == -1)
+                SwapTurnOrder(i, j);
+        }
+    }
+    gBattlescriptCurrInstr = cmd->nextInstr;
 }

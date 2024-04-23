@@ -521,7 +521,7 @@ BattleScript_AffectionBasedStatus_HealFreezeString:
 	printstring STRINGID_ATTACKERMELTEDTHEICE
 	goto BattleScript_AffectionBasedStatusHeal_Continue
 BattleScript_AffectionBasedStatus_HealFrostbiteString:
-	printstring STRINGID_ATTACKERHEALEDITSFROSTBITE
+	printstring STRINGID_ATTACKERMELTEDTHEICE
 BattleScript_AffectionBasedStatusHeal_Continue:
 	waitmessage B_WAIT_TIME_LONG
 	clearstatus BS_ATTACKER
@@ -3804,6 +3804,8 @@ BattleScript_FirstChargingTurnAfterAttackString:
 
 BattleScript_TwoTurnMovesSecondPowerHerbActivates:
 	call BattleScript_PowerHerbActivation
+	trygulpmissile @ Edge case for Cramorant ability Gulp Missile
+BattleScript_FromTwoTurnMovesSecondTurnRet:
 	call BattleScript_TwoTurnMovesSecondTurnRet
 	accuracycheck BattleScript_PrintMoveMissed, ACC_CURR_MOVE
 @ before Gen 5, charge moves did not print an attack string on the charge turn
@@ -7006,6 +7008,10 @@ BattleScript_UltraBurst::
 	switchinabilities BS_ATTACKER
 	end3
 
+BattleScript_GulpMissileFormChange::
+	call BattleScript_AttackerFormChange
+	goto BattleScript_FromTwoTurnMovesSecondTurnRet
+
 BattleScript_AttackerFormChange::
 	pause 5
 	copybyte gBattlerAbility, gBattlerAttacker
@@ -7049,10 +7055,7 @@ BattleScript_CudChewActivates::
 	pause B_WAIT_TIME_SHORTEST
 	call BattleScript_AbilityPopUp
 	setbyte sBERRY_OVERRIDE, 1 @ override the requirements for eating berries
-	consumeberry BS_TARGET, FALSE
-	orword gHitMarker, HITMARKER_IGNORE_BIDE | HITMARKER_IGNORE_SUBSTITUTE | HITMARKER_PASSIVE_DAMAGE
-	healthbarupdate BS_ATTACKER
-	datahpupdate BS_ATTACKER
+	consumeberry BS_SCRIPTING, FALSE
 	setbyte sBERRY_OVERRIDE, 0
 	end3
 
@@ -7781,6 +7784,7 @@ BattleScript_IntimidateEffect:
 	statbuffchange STAT_CHANGE_NOT_PROTECT_AFFECTED | STAT_CHANGE_ALLOW_PTR, BattleScript_IntimidateLoopIncrement
 	setgraphicalstatchangevalues
 	jumpifability BS_TARGET, ABILITY_CONTRARY, BattleScript_IntimidateContrary
+	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_DECREASE, BattleScript_IntimidateWontDecrease
 	playanimation BS_TARGET, B_ANIM_STATS_CHANGE, sB_ANIM_ARG1
 	printstring STRINGID_PKMNCUTSATTACKWITH
 BattleScript_IntimidateEffect_WaitString:
@@ -7796,6 +7800,10 @@ BattleScript_IntimidateEnd:
 	copybyte gBattlerTarget, sSAVED_BATTLER
 	pause B_WAIT_TIME_MED
 	end3
+
+BattleScript_IntimidateWontDecrease:
+	printstring STRINGID_STATSWONTDECREASE
+	goto BattleScript_IntimidateEffect_WaitString
 
 BattleScript_IntimidateContrary:
 	call BattleScript_AbilityPopUpTarget
@@ -7836,6 +7844,7 @@ BattleScript_SupersweetSyrupEffect:
 	statbuffchange STAT_CHANGE_NOT_PROTECT_AFFECTED | STAT_CHANGE_ALLOW_PTR, BattleScript_SupersweetSyrupLoopIncrement
 	setgraphicalstatchangevalues
 	jumpifability BS_TARGET, ABILITY_CONTRARY, BattleScript_SupersweetSyrupContrary
+	jumpifbyte CMP_EQUAL, cMULTISTRING_CHOOSER, B_MSG_STAT_WONT_DECREASE, BattleScript_SupersweetSyrupWontDecrease
 	playanimation BS_TARGET, B_ANIM_STATS_CHANGE, sB_ANIM_ARG1
 	printfromtable gStatDownStringIds
 BattleScript_SupersweetSyrupEffect_WaitString:
@@ -7851,6 +7860,10 @@ BattleScript_SupersweetSyrupEnd:
  	copybyte gBattlerTarget, sSAVED_BATTLER
 	pause B_WAIT_TIME_MED
 	end3
+
+BattleScript_SupersweetSyrupWontDecrease:
+	printstring STRINGID_STATSWONTDECREASE
+	goto BattleScript_SupersweetSyrupEffect_WaitString
 
 BattleScript_SupersweetSyrupContrary:
 	call BattleScript_AbilityPopUpTarget
@@ -8714,11 +8727,11 @@ BattleScript_BerryCureFrzRet::
 	removeitem BS_SCRIPTING
 	return
 
-BattleScript_BerryCureFsbEnd2::
+BattleScript_BerryCureFrbEnd2::
 	call BattleScript_BerryCureFrzRet
 	end2
 
-BattleScript_BerryCureFsbRet::
+BattleScript_BerryCureFrbRet::
 	playanimation BS_SCRIPTING, B_ANIM_HELD_ITEM_EFFECT
 	printstring STRINGID_PKMNSITEMHEALEDFROSTBITE
 	waitmessage B_WAIT_TIME_LONG

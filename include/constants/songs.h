@@ -278,6 +278,7 @@
 #define SE_PIKE_CURTAIN_CLOSE             267 // SE_CURTAIN
 #define SE_PIKE_CURTAIN_OPEN              268 // SE_CURTAIN1
 #define SE_SUDOWOODO_SHAKE                269 // SE_USSOKI
+#define END_SE                            SE_SUDOWOODO_SHAKE
 // Bard SFX
 #define PH_TRAP_BLEND                     271
 #define PH_TRAP_HELD                      272
@@ -337,6 +338,7 @@
 // Ruby & Sapphire Music 
 #define RS_MUSIC_START                    SONGS_START
 
+#define START_MUS                         322
 #define MUS_LITTLEROOT_TEST               322 // MUS_TETSUJI
 #define MUS_GSC_ROUTE38                   323 // MUS_FIELD13
 #define MUS_CAUGHT                        324 // MUS_KACHI22
@@ -396,7 +398,7 @@
 #define MUS_MT_CHIMNEY                    378 // MUS_TOZAN
 #define MUS_ENCOUNTER_FEMALE              379 // MUS_GIRLEYE
 #define MUS_LILYCOVE                      380 // MUS_MINAMO
-#define MUS_ROUTE111                      381 // MUS_ASHROAD
+#define MUS_DESERT                        381 // MUS_ASHROAD
 #define MUS_HELP                          382 // MUS_EVENT0
 #define MUS_UNDERWATER                    383 // MUS_DEEPDEEP
 #define MUS_VICTORY_TRAINER               384 // MUS_KACHI1
@@ -531,7 +533,7 @@
 #define MUS_RG_VS_MEWTWO                  507 // MUS_RG_VS_MYU2
 #define MUS_RG_VS_LEGEND                  508 // MUS_RG_VS_DEN
 #define MUS_RG_ENCOUNTER_GYM_LEADER       509 // MUS_RG_EXEYE
-#define MUS_RG_ENCOUNTER_DEOXYS           500 // MUS_RG_DEOEYE
+#define MUS_RG_ENCOUNTER_DEOXYS           510 // MUS_RG_DEOEYE
 #define MUS_RG_TRAINER_TOWER              511 // MUS_RG_T_TOWER
 #define MUS_RG_SLOW_PALLET                512 // MUS_RG_SLOWMASARA
 #define MUS_RG_TEACHY_TV_MENU             513 // MUS_RG_TVNOIZE
@@ -946,7 +948,7 @@
 #define MUS_HG_WIN_MINIGAME               898 // Cleared Wobbuffet Pop!
 
 #define HG_MUSIC_END                      MUS_HG_WIN_MINIGAME
-
+#define END_MUS                           HG_MUSIC_END
 #define SONGS_END                         HG_MUSIC_END
 
 #define MUS_ROUTE118                      0x7FFF  // Map is split into 2 music sections. controlled by GetCurrLocationDefaultMusic().

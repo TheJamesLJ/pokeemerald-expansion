@@ -5383,6 +5383,50 @@ bool32 IsSpeciesInHoennDex(u16 species)
         return TRUE;
 }
 
+u8 SpeciesToGenerationNumber(u16 species)
+{
+    species = SanitizeSpeciesId(species);
+    u16 natDexNo = SpeciesToNationalPokedexNum(species);
+
+    if(natDexNo <= NAT_DEX_GEN_1)
+        return GEN_1;
+    if(natDexNo <= NAT_DEX_GEN_2)
+        return GEN_2;
+    if(natDexNo <= NAT_DEX_GEN_3)
+        return GEN_3;
+    if(natDexNo <= NAT_DEX_GEN_4)
+        return GEN_4;
+    if(natDexNo <= NAT_DEX_GEN_5)
+        return GEN_5;
+    if(natDexNo <= NAT_DEX_GEN_6)
+        return GEN_6;
+    if(natDexNo <= NAT_DEX_GEN_7)
+        return GEN_7;
+    if(natDexNo <= NAT_DEX_GEN_8)
+        return GEN_8;
+    if(natDexNo <= NAT_DEX_GEN_9)
+        return GEN_9;
+        
+    return GEN_3;   
+}
+
+u16 GetGenSpecificPokemonBGM(u16 species)
+{
+    switch(SpeciesToGenerationNumber(species))
+    {
+        case GEN_1:
+            return MUS_HG_VS_WILD_KANTO;
+        case GEN_2:
+            return MUS_HG_VS_WILD;
+        case GEN_3:
+            return MUS_VS_WILD;
+        case GEN_4:
+            return MUS_DP_VS_WILD;
+        default:
+            return MUS_VS_WILD;
+    }
+}
+
 u16 GetBattleBGM(void)
 {
     if (gBattleTypeFlags & BATTLE_TYPE_LEGENDARY)
@@ -5566,7 +5610,7 @@ u16 GetBattleBGM(void)
             return MUS_DP_VS_ARCEUS;
         #endif
         default:
-            return MUS_VS_WILD;
+            return GetGenSpecificPokemonBGM(GetMonData(&gEnemyParty[0], MON_DATA_SPECIES, NULL));//MUS_VS_WILD;
         }
     }
 }

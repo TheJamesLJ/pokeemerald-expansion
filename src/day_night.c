@@ -58,14 +58,15 @@ static const u16 sTimeOfDayTints[][3] = {
 
 u8 GetCurrentTimeOfDay(void)
 {
+    RtcCalcLocalTime();
     if (gLocalTime.hours < HOUR_MORNING)
-        return TIME_NIGHT;
+        return DNS_TIME_NIGHT;
     else if (gLocalTime.hours < HOUR_DAY)
-        return TIME_MORNING;
+        return DNS_TIME_MORNING;
     else if (gLocalTime.hours < HOUR_NIGHT)
-        return TIME_DAY;
+        return DNS_TIME_DAY;
 
-    return TIME_NIGHT;
+    return DNS_TIME_NIGHT;
 }
 
 static void LoadPaletteOverrides(void)
@@ -220,6 +221,7 @@ void ProcessImmediateTimeEvents(void)
                 #define paletteIndex period
                 for (paletteIndex = 0; paletteIndex < NUM_PALS_TOTAL; paletteIndex++)
                     ApplyWeatherColorMapToPal(paletteIndex);
+                    UpdateSpritePaletteWithWeather(paletteIndex);
                 #undef paletteIndex
             }
         }
@@ -266,6 +268,7 @@ void LoadCompressedPalette_HandleDayNight(const u32 *src, u16 offset, u16 size, 
     }
     else
     {
+        CpuFill16(RGB_BLACK, &sPlttBufferPreDN[offset], size);
         CpuCopy16(gPaletteDecompressionBuffer, &gPlttBufferUnfaded[offset], size);
         CpuCopy16(gPaletteDecompressionBuffer, &gPlttBufferFaded[offset], size);
     }
@@ -281,6 +284,7 @@ void LoadPalette_HandleDayNight(const void *src, u16 offset, u16 size, bool32 is
     }
     else
     {
+        CpuFill16(RGB_BLACK, &sPlttBufferPreDN[offset], size);
         CpuCopy16(src, &gPlttBufferUnfaded[offset], size);
         CpuCopy16(src, &gPlttBufferFaded[offset], size);
     }

@@ -1393,7 +1393,7 @@
 	@ The specified id can be used to refer to the sprite again later with turnvobject.
 	.macro createvobject graphicsId:req, id:req, x:req, y:req, elevation=3, direction=DIR_SOUTH
 	.byte 0xaa
-	.byte \graphicsId
+	.2byte \graphicsId
 	.byte \id
 	.2byte \x
 	.2byte \y
@@ -1791,9 +1791,9 @@
 	.2byte \initialSelected
 	.byte \callbacks
 	.byte (.Ldynmultichoice_\@_2 - .Ldynmultichoice_\@_1) / 4
-.Ldynmultichoice_\@_1:
+	.Ldynmultichoice_\@_1:
 	.4byte \argv
-.Ldynmultichoice_\@_2:
+	.Ldynmultichoice_\@_2:
 	.endm
 
 	@ Displays a multichoice box from which the user can choose a selection, and blocks script execution until a selection is made.
@@ -1813,6 +1813,12 @@
 	_dynmultichoice \left, \top, \ignoreBPress, \maxBeforeScroll, \shouldSort, \initialSelected, \callbacks, NULL
 	.endm
 
+	@ Opens the Pokemart system, offering the specified products for sale.
+	@ Products should be a list of .2byte item values preceded by an .align 2
+	.macro pokemartmints products:req
+	.byte 0xe5
+	.4byte \products
+	.endm
 
 @ Supplementary
 

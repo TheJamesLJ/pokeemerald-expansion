@@ -228,6 +228,7 @@ Route101_EventScript_BirchsBag::
 	setobjectxy OBJ_EVENT_ID_PLAYER, 6, 13
 	applymovement OBJ_EVENT_ID_PLAYER, Common_Movement_WalkInPlaceFasterLeft
 	waitmovement 0
+	call Route101_EventScript_SelectGeneration
 	special ChooseStarter
 	waitstate
 	applymovement LOCALID_BIRCH, Route101_Movement_BirchApproachPlayer
@@ -259,6 +260,102 @@ Route101_EventScript_HideBrendanInBedroom::
 Route101_Movement_BirchApproachPlayer:
 	walk_right
 	step_end
+
+Route101_EventScript_SelectGeneration:
+	lock
+	faceplayer
+	msgbox Route101_EventScript_SelectGeneration_Text_0, MSGBOX_DEFAULT
+	dynmultipush Route101_EventScript_SelectGeneration_Text_1, 0
+	dynmultipush Route101_EventScript_SelectGeneration_Text_2, 1
+	dynmultipush Route101_EventScript_SelectGeneration_Text_3, 2
+	dynmultipush Route101_EventScript_SelectGeneration_Text_4, 3
+	dynmultipush Route101_EventScript_SelectGeneration_Text_5, 4
+	dynmultipush Route101_EventScript_SelectGeneration_Text_6, 5
+	dynmultipush Route101_EventScript_SelectGeneration_Text_7, 6
+	dynmultipush Route101_EventScript_SelectGeneration_Text_8, 7
+	dynmultipush Route101_EventScript_SelectGeneration_Text_9, 8
+	dynmultistack 0, 0, TRUE, 6, FALSE, VAR_STARTER_GEN_SELECTED, DYN_MULTICHOICE_CB_NONE
+	switch VAR_RESULT
+	case 0, Route101_EventScript_SelectGeneration_3
+	case 1, Route101_EventScript_SelectGeneration_4
+	case 2, Route101_EventScript_SelectGeneration_5
+	case 3, Route101_EventScript_SelectGeneration_6
+	case 4, Route101_EventScript_SelectGeneration_7
+	case 5, Route101_EventScript_SelectGeneration_8
+	case 6, Route101_EventScript_SelectGeneration_9
+	case 7, Route101_EventScript_SelectGeneration_10
+	case 8, Route101_EventScript_SelectGeneration_11
+	setvar VAR_STARTER_GEN_SELECTED, 2
+	
+Route101_EventScript_SelectGeneration_1:
+	closemessage
+	return
+
+Route101_EventScript_SelectGeneration_3:
+	setvar VAR_STARTER_GEN_SELECTED, 0
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_4:
+	setvar VAR_STARTER_GEN_SELECTED, 1
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_5:
+	setvar VAR_STARTER_GEN_SELECTED, 2
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_6:
+	setvar VAR_STARTER_GEN_SELECTED, 3
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_7:
+	setvar VAR_STARTER_GEN_SELECTED, 4
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_8:
+	setvar VAR_STARTER_GEN_SELECTED, 5
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_9:
+	setvar VAR_STARTER_GEN_SELECTED, 6
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_10:
+	setvar VAR_STARTER_GEN_SELECTED, 7
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_11:
+	setvar VAR_STARTER_GEN_SELECTED, 8
+	goto Route101_EventScript_SelectGeneration_1
+
+Route101_EventScript_SelectGeneration_Text_0:
+	.string "What Gen. do you want to start with?$"
+
+Route101_EventScript_SelectGeneration_Text_1:
+	.string "Gen. 1$"
+
+Route101_EventScript_SelectGeneration_Text_2:
+	.string "Gen. 2$"
+
+Route101_EventScript_SelectGeneration_Text_3:
+	.string "Gen. 3$"
+
+Route101_EventScript_SelectGeneration_Text_4:
+	.string "Gen. 4$"
+
+Route101_EventScript_SelectGeneration_Text_5:
+	.string "Gen. 5$"
+
+Route101_EventScript_SelectGeneration_Text_6:
+	.string "Gen. 6$"
+
+Route101_EventScript_SelectGeneration_Text_7:
+	.string "Gen. 7$"
+
+Route101_EventScript_SelectGeneration_Text_8:
+	.string "Gen. 8$"
+
+Route101_EventScript_SelectGeneration_Text_9:
+	.string "Gen. 9$"
 
 Route101_Text_HelpMe:
 	.string "H-help me!$"

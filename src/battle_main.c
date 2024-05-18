@@ -65,6 +65,7 @@
 #include "constants/songs.h"
 #include "constants/trainers.h"
 #include "cable_club.h"
+#include "trainer_level_scale.h"
 
 extern const struct BgTemplate gBattleBgTemplates[];
 extern const struct WindowTemplate *const gBattleWindowTemplates[];
@@ -115,7 +116,6 @@ static void HandleEndTurn_MonFled(void);
 static void HandleEndTurn_FinishBattle(void);
 static void SpriteCB_UnusedBattleInit(struct Sprite *sprite);
 static void SpriteCB_UnusedBattleInit_Main(struct Sprite *sprite);
-static void TrySpecialEvolution(void);
 static u32 Crc32B (const u8 *data, u32 size);
 static u32 GeneratePartyHash(const struct Trainer *trainer, u32 i);
 
@@ -2218,6 +2218,13 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
                                                                         | BATTLE_TYPE_EREADER_TRAINER
                                                                         | BATTLE_TYPE_TRAINER_HILL)))
     {
+        u16 levelMin = 0;
+        u16 numBadges = 0;
+        u16 partyCountMod;
+
+        numBadges = GetPlayerNumBadges();
+        levelMin = GetPlayerMaxLevel();
+
         if (firstTrainer == TRUE)
             ZeroEnemyPartyMons();
 
@@ -2227,10 +2234,12 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
                 monsCount = PARTY_SIZE / 2;
             else
                 monsCount = trainer->partySize;
+            partyCountMod = monsCount * 2 - 1;
         }
         else
         {
             monsCount = trainer->partySize;
+            partyCountMod = monsCount - 1;
         }
 
         for (i = 0; i < monsCount; i++)
@@ -2241,6 +2250,8 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
             u32 otIdType = OT_ID_RANDOM_NO_SHINY;
             u32 fixedOtId = 0;
             u32 ability = 0;
+            u16 level;
+            u16 species;
 
             if (trainer->doubleBattle == TRUE)
                 personalityValue = 0x80;
@@ -2260,7 +2271,22 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
                 otIdType = OT_ID_PRESET;
                 fixedOtId = HIHALF(personalityValue) ^ LOHALF(personalityValue);
             }
-            CreateMon(&party[i], partyData[i].species, partyData[i].lvl, 0, TRUE, personalityValue, otIdType, fixedOtId);
+
+            level = CalculateTrainerPartyScaledLevel(trainer->trainerClass, partyData[i].lvl, levelMin, partyCountMod, numBadges);
+            CreateMon(&party[i], partyData[i].species, level, 0, TRUE, personalityValue, otIdType, fixedOtId);
+
+            species = CheckLevelScaleEvolution(&party[i]);
+            if(species != SPECIES_NONE)
+            {
+                CreateMon(&party[i], species, level, 0, TRUE, personalityValue, otIdType, fixedOtId);
+
+                species = CheckLevelScaleEvolution(&party[i]);
+                if(species != SPECIES_NONE)
+                {
+                    CreateMon(&party[i], species, level, 0, TRUE, personalityValue, otIdType, fixedOtId);
+                }
+            }
+
             SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
 
             CustomTrainerPartyAssignMoves(&party[i], &partyData[i]);
@@ -5808,7 +5834,7 @@ static void FreeResetData_ReturnToOvOrDoEvolutions(void)
                 || gBattleOutcome == B_OUTCOME_WON
                 || gBattleOutcome == B_OUTCOME_CAUGHT))
         {
-            gBattleMainFunc = TrySpecialEvolution;
+            gBattleMainFunc = TryEvolvePokemon;
         }
         else
         {
@@ -5826,61 +5852,41 @@ static void FreeResetData_ReturnToOvOrDoEvolutions(void)
     }
 }
 
-static void TrySpecialEvolution(void) // Attempts to perform non-level related battle evolutions (not the script command).
+static void TryEvolvePokemon(void)
 {
     s32 i;
 
     for (i = 0; i < PARTY_SIZE; i++)
     {
-        u16 species = GetEvolutionTargetSpecies(&gPlayerParty[i], EVO_MODE_BATTLE_SPECIAL, i, NULL);
-        if (species != SPECIES_NONE && !(sTriedEvolving & gBitTable[i]))
+        if (!(sTriedEvolving & gBitTable[i]))
         {
+            u16 species = GetEvolutionTargetSpecies(&gPlayerParty[i], EVO_MODE_BATTLE_SPECIAL, i, NULL);
             sTriedEvolving |= gBitTable[i];
-            FreeAllWindowBuffers();
-            gBattleMainFunc = WaitForEvoSceneToFinish;
-            EvolutionScene(&gPlayerParty[i], species, TRUE, i);
-            return;
-        }
-    }
-    sTriedEvolving = 0;
-    gBattleMainFunc = TryEvolvePokemon;
-}
 
-static void TryEvolvePokemon(void)
-{
-    s32 i;
+            if (species == SPECIES_NONE && (gLeveledUpInBattle & gBitTable[i]))
+            { 
+                gLeveledUpInBattle &= ~(gBitTable[i]);
+                species = GetEvolutionTargetSpecies(&gPlayerParty[i], EVO_MODE_NORMAL, gLeveledUpInBattle, NULL);
+            }
 
-    while (gLeveledUpInBattle != 0)
-    {
-        for (i = 0; i < PARTY_SIZE; i++)
-        {
-            if (gLeveledUpInBattle & gBitTable[i])
+            if (species != SPECIES_NONE)
             {
-                u16 species;
-                u8 levelUpBits = gLeveledUpInBattle;
-
-                levelUpBits &= ~(gBitTable[i]);
-                gLeveledUpInBattle = levelUpBits;
-
-                species = GetEvolutionTargetSpecies(&gPlayerParty[i], EVO_MODE_NORMAL, levelUpBits, NULL);
-                if (species != SPECIES_NONE)
-                {
-                    FreeAllWindowBuffers();
-                    gBattleMainFunc = WaitForEvoSceneToFinish;
-                    EvolutionScene(&gPlayerParty[i], species, TRUE, i);
-                    return;
-                }
+                FreeAllWindowBuffers();
+                gBattleMainFunc = WaitForEvoSceneToFinish;
+                EvolutionScene(&gPlayerParty[i], species, TRUE, i);
+                return;
             }
         }
     }
-
+    sTriedEvolving = 0;
+    gLeveledUpInBattle = 0;
     gBattleMainFunc = ReturnFromBattleToOverworld;
 }
 
 static void WaitForEvoSceneToFinish(void)
 {
     if (gMain.callback2 == BattleMainCB2)
-        gBattleMainFunc = TrySpecialEvolution;
+        gBattleMainFunc = TryEvolvePokemon;
 }
 
 static void ReturnFromBattleToOverworld(void)

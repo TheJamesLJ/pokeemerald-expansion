@@ -361,6 +361,7 @@ SECTIONS {
         src/expansion_intro.o(.text);
         src/sound_check_menu.o(.text);
         src/day_night.o(.text);
+        src/ui_birch_case.o(.text);
     } > ROM =0
 
     script_data :
@@ -730,6 +731,7 @@ SECTIONS {
         src/expansion_intro.o(.rodata);
         src/sound_check_menu.o(.rodata);
         src/day_night.o(.rodata);
+        src/ui_birch_case.o(.rodata);
     } > ROM =0
 
     song_data :

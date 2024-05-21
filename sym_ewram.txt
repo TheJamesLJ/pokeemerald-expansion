@@ -154,3 +154,4 @@
 	.include "src/pokedex_plus_hgss.o"
 	.include "src/sound_check_menu.o"
   .include "src/day_night.o"
+  .include "src/ui_birch_case.o"

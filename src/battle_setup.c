@@ -49,6 +49,7 @@
 #include "constants/trainers.h"
 #include "constants/trainer_hill.h"
 #include "constants/weather.h"
+#include "ui_birch_case.h"
 
 enum {
     TRANSITION_TYPE_NORMAL,
@@ -82,6 +83,8 @@ static void CB2_EndScriptedWildBattle(void);
 static void TryUpdateGymLeaderRematchFromWild(void);
 static void TryUpdateGymLeaderRematchFromTrainer(void);
 static void CB2_GiveStarter(void);
+static void Task_BirchCaseStarter(u8 taskId);
+static void CB2_BirchCaseStartFirstBattle(void);
 static void CB2_StartFirstBattle(void);
 static void CB2_EndFirstBattle(void);
 static void SaveChangesToPlayerParty(void);
@@ -1027,6 +1030,21 @@ void ChooseStarter(void)
     gMain.savedCallback = CB2_GiveStarter;
 }
 
+void BirchCaseChooseStarter(void)
+{
+    CreateTask(Task_BirchCaseStarter, 0);
+}
+
+void Task_BirchCaseStarter(u8 taskId)
+{
+    if (!gPaletteFade.active)
+    {
+        CleanupOverworldWindowsAndTilemaps();
+        BirchCase_Init(CB2_BirchCaseStartFirstBattle);
+        DestroyTask(taskId);
+    }
+}
+
 static void CB2_GiveStarter(void)
 {
     u16 starterMon;
@@ -1034,6 +1052,14 @@ static void CB2_GiveStarter(void)
     *GetVarPointer(VAR_STARTER_MON) = gSpecialVar_Result;
     starterMon = GetStarterPokemon(gSpecialVar_Result);
     ScriptGiveMon(starterMon, 5, ITEM_NONE);
+    ResetTasks();
+    PlayBattleBGM();
+    SetMainCallback2(CB2_StartFirstBattle);
+    BattleTransition_Start(B_TRANSITION_BLUR);
+}
+
+static void CB2_BirchCaseStartFirstBattle(void)
+{
     ResetTasks();
     PlayBattleBGM();
     SetMainCallback2(CB2_StartFirstBattle);

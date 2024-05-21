@@ -445,49 +445,11 @@ static void DrawMultichoiceMenu(u8 left, u8 top, u8 multichoiceId, bool8 ignoreB
     DrawMultichoiceMenuInternal(left, top, multichoiceId, ignoreBPress, cursorPos, sMultichoiceLists[multichoiceId].list, sMultichoiceLists[multichoiceId].count);
 }
 
-#define tLeft           data[0]
-#define tTop            data[1]
-#define tRight          data[2]
-#define tBottom         data[3]
-#define tIgnoreBPress   data[4]
-#define tDoWrap         data[5]
-#define tWindowId       data[6]
-#define tMultichoiceId  data[7]
-
-static void InitMultichoiceCheckWrap(bool8 ignoreBPress, u8 count, u8 windowId, u8 multichoiceId)
-{
-    u8 i;
-    u8 taskId;
-    sProcessInputDelay = 2;
-
-    for (i = 0; i < ARRAY_COUNT(sLinkServicesMultichoiceIds); i++)
-    {
-        if (sLinkServicesMultichoiceIds[i] == multichoiceId)
-        {
-            sProcessInputDelay = 12;
-        }
-    }
-
-    taskId = CreateTask(Task_HandleMultichoiceInput, 80);
-
-    gTasks[taskId].tIgnoreBPress = ignoreBPress;
-
-    if (count > 3)
-        gTasks[taskId].tDoWrap = TRUE;
-    else
-        gTasks[taskId].tDoWrap = FALSE;
-
-    gTasks[taskId].tWindowId = windowId;
-    gTasks[taskId].tMultichoiceId = multichoiceId;
-
-    DrawLinkServicesMultichoiceMenu(multichoiceId);
-}
-
 static void Task_HandleScrollingMultichoiceInput(u8 taskId)
 {
     bool32 done = FALSE;
     s32 input = ListMenu_ProcessInput(gTasks[taskId].data[0]);
-    
+
     switch (input)
     {
     case LIST_HEADER:
@@ -534,6 +496,44 @@ static void Task_HandleScrollingMultichoiceInput(u8 taskId)
         ScriptContext_Enable();
         DestroyTask(taskId);
     }
+}
+
+#define tLeft           data[0]
+#define tTop            data[1]
+#define tRight          data[2]
+#define tBottom         data[3]
+#define tIgnoreBPress   data[4]
+#define tDoWrap         data[5]
+#define tWindowId       data[6]
+#define tMultichoiceId  data[7]
+
+static void InitMultichoiceCheckWrap(bool8 ignoreBPress, u8 count, u8 windowId, u8 multichoiceId)
+{
+    u8 i;
+    u8 taskId;
+    sProcessInputDelay = 2;
+
+    for (i = 0; i < ARRAY_COUNT(sLinkServicesMultichoiceIds); i++)
+    {
+        if (sLinkServicesMultichoiceIds[i] == multichoiceId)
+        {
+            sProcessInputDelay = 12;
+        }
+    }
+
+    taskId = CreateTask(Task_HandleMultichoiceInput, 80);
+
+    gTasks[taskId].tIgnoreBPress = ignoreBPress;
+
+    if (count > 3)
+        gTasks[taskId].tDoWrap = TRUE;
+    else
+        gTasks[taskId].tDoWrap = FALSE;
+
+    gTasks[taskId].tWindowId = windowId;
+    gTasks[taskId].tMultichoiceId = multichoiceId;
+
+    DrawLinkServicesMultichoiceMenu(multichoiceId);
 }
 
 static void Task_HandleMultichoiceInput(u8 taskId)

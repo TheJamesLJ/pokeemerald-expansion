@@ -4,6 +4,7 @@
 #include "decompress.h"
 #include "decoration.h"
 #include "decoration_inventory.h"
+#include "event_data.h"
 #include "event_object_movement.h"
 #include "field_player_avatar.h"
 #include "field_screen_effect.h"
@@ -68,6 +69,7 @@ enum {
     MART_TYPE_NORMAL,
     MART_TYPE_DECOR,
     MART_TYPE_DECOR2,
+    MART_TYPE_MINT,
 };
 
 // shop view window NPC info enum
@@ -154,6 +156,294 @@ static void Task_HandleShopMenuBuy(u8 taskId);
 static void Task_HandleShopMenuSell(u8 taskId);
 static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, struct ListMenu *list);
 static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y);
+
+/**
+ * Badge based Shop inventory
+ */
+static const u16 sShopInventory_ZeroBadges[] = {
+    ITEM_POKE_BALL,
+    ITEM_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_REVIVE,
+    ITEM_RARE_CANDY,
+    ITEM_NONE
+};
+
+static const u16 sShopInventory_OneBadge[] = {
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_NEST_BALL,
+    ITEM_POTION,
+    ITEM_SUPER_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_REVIVE,
+    ITEM_RARE_CANDY,
+    ITEM_NONE
+};
+
+static const u16 sShopInventory_TwoBadges[] = {
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_NEST_BALL,
+    ITEM_DUSK_BALL,
+    ITEM_HEAL_BALL,
+    ITEM_POTION,
+    ITEM_SUPER_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_REVIVE,
+    ITEM_POKE_DOLL,
+    ITEM_RARE_CANDY,
+    ITEM_NONE
+};
+
+static const u16 sShopInventory_ThreeBadges[] = {
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_NEST_BALL,
+    ITEM_DUSK_BALL,
+    ITEM_HEAL_BALL,
+    ITEM_NET_BALL,
+    ITEM_DIVE_BALL,
+    ITEM_POTION,
+    ITEM_SUPER_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_REVIVE,
+    ITEM_REPEL,
+    ITEM_POKE_DOLL,
+    ITEM_RARE_CANDY,
+    ITEM_NONE
+};
+
+static const u16 sShopInventory_FourBadges[] = {
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_NEST_BALL,
+    ITEM_DUSK_BALL,
+    ITEM_HEAL_BALL,
+    ITEM_NET_BALL,
+    ITEM_DIVE_BALL,
+    ITEM_QUICK_BALL,
+    ITEM_DREAM_BALL,
+    ITEM_POTION,
+    ITEM_SUPER_POTION,
+    ITEM_HYPER_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_REVIVE,
+    ITEM_REPEL,
+    ITEM_POKE_DOLL,
+    ITEM_RARE_CANDY,
+    ITEM_NONE
+};
+
+static const u16 sShopInventory_FiveBadges[] = {
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_ULTRA_BALL,
+    ITEM_NEST_BALL,
+    ITEM_DUSK_BALL,
+    ITEM_HEAL_BALL,
+    ITEM_NET_BALL,
+    ITEM_DIVE_BALL,
+    ITEM_QUICK_BALL,
+    ITEM_DREAM_BALL,
+    ITEM_REPEAT_BALL,
+    ITEM_TIMER_BALL,
+    ITEM_POTION,
+    ITEM_SUPER_POTION,
+    ITEM_HYPER_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_REVIVE,
+    ITEM_REPEL,
+    ITEM_SUPER_REPEL,
+    ITEM_POKE_DOLL,
+    ITEM_RARE_CANDY,
+    ITEM_NONE
+};
+
+static const u16 sShopInventory_SixBadges[] = {
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_ULTRA_BALL,
+    ITEM_NEST_BALL,
+    ITEM_DUSK_BALL,
+    ITEM_HEAL_BALL,
+    ITEM_NET_BALL,
+    ITEM_DIVE_BALL,
+    ITEM_QUICK_BALL,
+    ITEM_DREAM_BALL,
+    ITEM_REPEAT_BALL,
+    ITEM_TIMER_BALL,
+    ITEM_LUXURY_BALL,
+    ITEM_LURE_BALL,
+    ITEM_FRIEND_BALL,
+    ITEM_MOON_BALL,
+    ITEM_POTION,
+    ITEM_SUPER_POTION,
+    ITEM_HYPER_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_FULL_HEAL,
+    ITEM_REVIVE,
+    ITEM_REPEL,
+    ITEM_SUPER_REPEL,
+    ITEM_POKE_DOLL,
+    ITEM_RARE_CANDY,
+    ITEM_NONE
+};
+
+static const u16 sShopInventory_SevenBadges[] = {
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_ULTRA_BALL,
+    ITEM_NEST_BALL,
+    ITEM_DUSK_BALL,
+    ITEM_HEAL_BALL,
+    ITEM_NET_BALL,
+    ITEM_DIVE_BALL,
+    ITEM_QUICK_BALL,
+    ITEM_DREAM_BALL,
+    ITEM_REPEAT_BALL,
+    ITEM_TIMER_BALL,
+    ITEM_LUXURY_BALL,
+    ITEM_LURE_BALL,
+    ITEM_FRIEND_BALL,
+    ITEM_MOON_BALL,
+    ITEM_FAST_BALL,
+    ITEM_SPORT_BALL,
+    ITEM_LOVE_BALL,
+    ITEM_LEVEL_BALL,
+    ITEM_HEAVY_BALL,
+    ITEM_POTION,
+    ITEM_SUPER_POTION,
+    ITEM_HYPER_POTION,
+    ITEM_MAX_POTION,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_FULL_HEAL,
+    ITEM_REVIVE,
+    ITEM_REPEL,
+    ITEM_SUPER_REPEL,
+    ITEM_MAX_REPEL,
+    ITEM_POKE_DOLL,
+    ITEM_RARE_CANDY,
+    ITEM_NONE
+};
+
+static const u16 sShopInventory_EightBadges[] = {
+    ITEM_POKE_BALL,
+    ITEM_GREAT_BALL,
+    ITEM_ULTRA_BALL,
+    ITEM_NEST_BALL,
+    ITEM_DUSK_BALL,
+    ITEM_HEAL_BALL,
+    ITEM_NET_BALL,
+    ITEM_DIVE_BALL,
+    ITEM_QUICK_BALL,
+    ITEM_DREAM_BALL,
+    ITEM_REPEAT_BALL,
+    ITEM_TIMER_BALL,
+    ITEM_LUXURY_BALL,
+    ITEM_LURE_BALL,
+    ITEM_FRIEND_BALL,
+    ITEM_MOON_BALL,
+    ITEM_FAST_BALL,
+    ITEM_SPORT_BALL,
+    ITEM_LOVE_BALL,
+    ITEM_LEVEL_BALL,
+    ITEM_HEAVY_BALL,
+    ITEM_POTION,
+    ITEM_SUPER_POTION,
+    ITEM_HYPER_POTION,
+    ITEM_MAX_POTION,
+    ITEM_FULL_RESTORE,
+    ITEM_ANTIDOTE,
+    ITEM_BURN_HEAL,
+    ITEM_ICE_HEAL,
+    ITEM_AWAKENING,
+    ITEM_PARALYZE_HEAL,
+    ITEM_FULL_HEAL,
+    ITEM_REVIVE,
+    ITEM_REPEL,
+    ITEM_SUPER_REPEL,
+    ITEM_MAX_REPEL,
+    ITEM_POKE_DOLL,
+    ITEM_RARE_CANDY,
+    ITEM_ABILITY_CAPSULE,
+    ITEM_NONE
+};
+
+static const u16 *const sShopInventoriesBadge[] = 
+{
+    sShopInventory_ZeroBadges, 
+    sShopInventory_OneBadge,
+    sShopInventory_TwoBadges,
+    sShopInventory_ThreeBadges,
+    sShopInventory_FourBadges,
+    sShopInventory_FiveBadges,
+    sShopInventory_SixBadges,
+    sShopInventory_SevenBadges,
+    sShopInventory_EightBadges
+};
+
+static const u16 sShopInventory_Mints[] = {
+    ITEM_LONELY_MINT,
+    ITEM_ADAMANT_MINT,
+    ITEM_NAUGHTY_MINT,
+    ITEM_BRAVE_MINT,
+    ITEM_BOLD_MINT,
+    ITEM_IMPISH_MINT,
+    ITEM_LAX_MINT,
+    ITEM_RELAXED_MINT,
+    ITEM_MODEST_MINT,
+    ITEM_MILD_MINT,
+    ITEM_RASH_MINT,
+    ITEM_QUIET_MINT,
+    ITEM_CALM_MINT,
+    ITEM_GENTLE_MINT,
+    ITEM_CAREFUL_MINT,
+    ITEM_SASSY_MINT,
+    ITEM_TIMID_MINT,
+    ITEM_HASTY_MINT,
+    ITEM_JOLLY_MINT,
+    ITEM_NAIVE_MINT,
+    ITEM_SERIOUS_MINT,
+    ITEM_NONE
+};
+
+static const u16 *const sShopInventoriesSpecial[] = 
+{
+    [MART_TYPE_MINT] = sShopInventory_Mints,
+};
 
 static const struct YesNoFuncTable sShopPurchaseYesNoFuncs =
 {
@@ -336,6 +626,20 @@ static const u8 sShopBuyMenuTextColors[][3] =
     [COLORID_GRAY_CURSOR] = {0, 3, 2},
 };
 
+static u8 GetNumberOfBadges(void)
+{
+    u16 badgeFlag;
+    u8 count = 0;
+    
+    for (badgeFlag = FLAG_BADGE01_GET; badgeFlag < FLAG_BADGE01_GET + NUM_BADGES; badgeFlag++)
+    {
+        if (FlagGet(badgeFlag))
+            count++;
+    }
+    
+    return count;
+}
+
 static u8 CreateShopMenu(u8 martType)
 {
     int numMenuItems;
@@ -343,7 +647,7 @@ static u8 CreateShopMenu(u8 martType)
     LockPlayerFieldControls();
     sMartInfo.martType = martType;
 
-    if (martType == MART_TYPE_NORMAL)
+    if (martType == MART_TYPE_NORMAL || martType == MART_TYPE_MINT)
     {
         struct WindowTemplate winTemplate = sShopMenuWindowTemplates[WIN_BUY_SELL_QUIT];
         winTemplate.width = GetMaxWidthInMenuTable(sShopMenuActions_BuySellQuit, ARRAY_COUNT(sShopMenuActions_BuySellQuit));
@@ -377,8 +681,15 @@ static void SetShopMenuCallback(void (* callback)(void))
 static void SetShopItemsForSale(const u16 *items)
 {
     u16 i = 0;
+    u8 badgeCount = GetNumberOfBadges();
 
-    sMartInfo.itemList = items;
+    if(sMartInfo.martType == MART_TYPE_MINT)
+        sMartInfo.itemList = sShopInventoriesSpecial[sMartInfo.martType];
+    else if(items == NULL)
+        sMartInfo.itemList = sShopInventoriesBadge[badgeCount];
+    else
+        sMartInfo.itemList = items;
+
     sMartInfo.itemCount = 0;
 
     // Read items until ITEM_NONE / DECOR_NONE is reached
@@ -578,7 +889,7 @@ static void BuyMenuBuildListMenuTemplate(void)
 
 static void BuyMenuSetListEntry(struct ListMenuItem *menuItem, u16 item, u8 *name)
 {
-    if (sMartInfo.martType == MART_TYPE_NORMAL)
+    if (sMartInfo.martType == MART_TYPE_NORMAL || sMartInfo.martType == MART_TYPE_MINT)
         CopyItemName(item, name);
     else
         StringCopy(name, gDecorations[item].name);
@@ -602,7 +913,7 @@ static void BuyMenuPrintItemDescriptionAndShowItemIcon(s32 item, bool8 onInit, s
     sShopData->iconSlot ^= 1;
     if (item != LIST_CANCEL)
     {
-        if (sMartInfo.martType == MART_TYPE_NORMAL)
+        if (sMartInfo.martType == MART_TYPE_NORMAL || sMartInfo.martType == MART_TYPE_MINT)
             description = ItemId_GetDescription(item);
         else
             description = gDecorations[item].description;
@@ -622,7 +933,7 @@ static void BuyMenuPrintPriceInList(u8 windowId, u32 itemId, u8 y)
 
     if (itemId != LIST_CANCEL)
     {
-        if (sMartInfo.martType == MART_TYPE_NORMAL)
+        if (sMartInfo.martType == MART_TYPE_NORMAL || sMartInfo.martType == MART_TYPE_MINT)
         {
             ConvertIntToDecimalStringN(
                 gStringVar1,
@@ -686,7 +997,7 @@ static void BuyMenuAddItemIcon(u16 item, u8 iconSlot)
     if (*spriteIdPtr != SPRITE_NONE)
         return;
 
-    if (sMartInfo.martType == MART_TYPE_NORMAL || item == ITEM_LIST_END)
+    if ((sMartInfo.martType == MART_TYPE_NORMAL || sMartInfo.martType == MART_TYPE_MINT) || item == ITEM_LIST_END)
     {
         spriteId = AddItemIconSprite(iconSlot + TAG_ITEM_ICON_BASE, iconSlot + TAG_ITEM_ICON_BASE, item);
         if (spriteId != MAX_SPRITES)
@@ -987,7 +1298,7 @@ static void Task_BuyMenu(u8 taskId)
             BuyMenuRemoveScrollIndicatorArrows();
             BuyMenuPrintCursor(tListTaskId, COLORID_GRAY_CURSOR);
 
-            if (sMartInfo.martType == MART_TYPE_NORMAL)
+            if (sMartInfo.martType == MART_TYPE_NORMAL || sMartInfo.martType == MART_TYPE_MINT)
                 sShopData->totalCost = (ItemId_GetPrice(itemId) >> IsPokeNewsActive(POKENEWS_SLATEPORT));
             else
                 sShopData->totalCost = gDecorations[itemId].price;
@@ -1000,7 +1311,7 @@ static void Task_BuyMenu(u8 taskId)
             }
             else
             {
-                if (sMartInfo.martType == MART_TYPE_NORMAL)
+                if (sMartInfo.martType == MART_TYPE_NORMAL || sMartInfo.martType == MART_TYPE_MINT)
                 {
                     CopyItemName(itemId, gStringVar1);
                     if (ItemId_GetImportance(itemId))
@@ -1112,7 +1423,7 @@ static void BuyMenuTryMakePurchase(u8 taskId)
 
     PutWindowTilemap(WIN_ITEM_LIST);
 
-    if (sMartInfo.martType == MART_TYPE_NORMAL)
+    if (sMartInfo.martType == MART_TYPE_NORMAL || sMartInfo.martType == MART_TYPE_MINT)
     {
         if (AddBagItem(tItemId, tItemCount) == TRUE)
         {
@@ -1147,7 +1458,7 @@ static void BuyMenuSubtractMoney(u8 taskId)
     PlaySE(SE_SHOP);
     PrintMoneyAmountInMoneyBox(WIN_MONEY, GetMoney(&gSaveBlock1Ptr->money), 0);
 
-    if (sMartInfo.martType == MART_TYPE_NORMAL)
+    if (sMartInfo.martType == MART_TYPE_NORMAL || sMartInfo.martType == MART_TYPE_MINT)
         gTasks[taskId].func = Task_ReturnToItemListAfterItemPurchase;
     else
         gTasks[taskId].func = Task_ReturnToItemListAfterDecorationPurchase;
@@ -1296,5 +1607,13 @@ void CreateDecorationShop2Menu(const u16 *itemsForSale)
 {
     CreateShopMenu(MART_TYPE_DECOR2);
     SetShopItemsForSale(itemsForSale);
+    SetShopMenuCallback(ScriptContext_Enable);
+}
+
+void CreatePokemartMintsMenu(const u16 *itemsForSale)
+{
+    CreateShopMenu(MART_TYPE_MINT);
+    SetShopItemsForSale(itemsForSale);
+    ClearItemPurchases();
     SetShopMenuCallback(ScriptContext_Enable);
 }

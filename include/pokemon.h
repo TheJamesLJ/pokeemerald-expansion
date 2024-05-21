@@ -593,6 +593,15 @@ struct Fusion
 
 extern const struct Fusion *const gFusionTablePointers[NUM_SPECIES];
 
+struct TrainerMonSpread
+{
+    u8 EVs[6];
+    u8 IVs[6];
+    u8 nature; 
+};
+
+extern const struct TrainerMonSpread gSets[];
+
 #define NUM_UNOWN_FORMS 28
 
 #define GET_UNOWN_LETTER(personality) ((   \
@@ -752,6 +761,8 @@ u8 GetLevelUpMovesBySpecies(u16 species, u16 *moves);
 u8 GetNumberOfRelearnableMoves(struct Pokemon *mon);
 u16 SpeciesToPokedexNum(u16 species);
 bool32 IsSpeciesInHoennDex(u16 species);
+u8 SpeciesToGenerationNumber(u16 species);
+u16 GetGenSpecificPokemonBGM(u16 species);
 u16 GetBattleBGM(void);
 void PlayBattleBGM(void);
 void PlayMapChosenOrBattleBGM(u16 songId);

@@ -65,6 +65,7 @@
 #include "constants/songs.h"
 #include "constants/trainers.h"
 #include "cable_club.h"
+#include "trainer_level_scale.h"
 
 extern const struct BgTemplate gBattleBgTemplates[];
 extern const struct WindowTemplate *const gBattleWindowTemplates[];
@@ -2217,6 +2218,13 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
                                                                         | BATTLE_TYPE_EREADER_TRAINER
                                                                         | BATTLE_TYPE_TRAINER_HILL)))
     {
+        u16 levelMin = 0;
+        u16 numBadges = 0;
+        u16 partyCountMod;
+
+        numBadges = GetPlayerNumBadges();
+        levelMin = GetPlayerMaxLevel();
+
         if (firstTrainer == TRUE)
             ZeroEnemyPartyMons();
 
@@ -2226,10 +2234,12 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
                 monsCount = PARTY_SIZE / 2;
             else
                 monsCount = trainer->partySize;
+            partyCountMod = monsCount * 2 - 1;
         }
         else
         {
             monsCount = trainer->partySize;
+            partyCountMod = monsCount - 1;
         }
 
         for (i = 0; i < monsCount; i++)
@@ -2240,6 +2250,8 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
             u32 otIdType = OT_ID_RANDOM_NO_SHINY;
             u32 fixedOtId = 0;
             u32 ability = 0;
+            u16 level;
+            u16 species;
 
             if (trainer->doubleBattle == TRUE)
                 personalityValue = 0x80;
@@ -2259,7 +2271,22 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
                 otIdType = OT_ID_PRESET;
                 fixedOtId = HIHALF(personalityValue) ^ LOHALF(personalityValue);
             }
-            CreateMon(&party[i], partyData[i].species, partyData[i].lvl, 0, TRUE, personalityValue, otIdType, fixedOtId);
+
+            level = CalculateTrainerPartyScaledLevel(trainer->trainerClass, partyData[i].lvl, levelMin, partyCountMod, numBadges);
+            CreateMon(&party[i], partyData[i].species, level, 0, TRUE, personalityValue, otIdType, fixedOtId);
+
+            species = CheckLevelScaleEvolution(&party[i]);
+            if(species != SPECIES_NONE)
+            {
+                CreateMon(&party[i], species, level, 0, TRUE, personalityValue, otIdType, fixedOtId);
+
+                species = CheckLevelScaleEvolution(&party[i]);
+                if(species != SPECIES_NONE)
+                {
+                    CreateMon(&party[i], species, level, 0, TRUE, personalityValue, otIdType, fixedOtId);
+                }
+            }
+
             SetMonData(&party[i], MON_DATA_HELD_ITEM, &partyData[i].heldItem);
 
             CustomTrainerPartyAssignMoves(&party[i], &partyData[i]);

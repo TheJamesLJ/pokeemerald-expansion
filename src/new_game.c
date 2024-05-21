@@ -92,7 +92,7 @@ static void SetDefaultOptions(void)
 {
     gSaveBlock2Ptr->optionsTextSpeed = OPTIONS_TEXT_SPEED_MID;
     gSaveBlock2Ptr->optionsWindowFrameType = 0;
-    gSaveBlock2Ptr->optionsSound = OPTIONS_SOUND_MONO;
+    gSaveBlock2Ptr->optionsSound = OPTIONS_SOUND_STEREO;
     gSaveBlock2Ptr->optionsBattleStyle = OPTIONS_BATTLE_STYLE_SHIFT;
     gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
     gSaveBlock2Ptr->regionMapZoom = FALSE;
@@ -205,6 +205,9 @@ void NewGameInitData(void)
     WipeTrainerNameRecords();
     ResetTrainerHillResults();
     ResetContestLinkResults();
+    //gSaveBlock1Ptr->vars[VAR_STARTER_GEN_SELECTED - VARS_START] = 2;
+    VarSet(VAR_STARTER_GEN_SELECTED, 2); //Gen 3.
+    AddBagItem(ITEM_EXP_SHARE, 1);
 }
 
 static void ResetMiniGamesRecords(void)

@@ -601,10 +601,12 @@ void BattleSetup_StartLegendaryBattle(void)
     default:
     case SPECIES_GROUDON:
     case SPECIES_GROUDON_PRIMAL:
+    case SPECIES_KORAIDON:
         CreateBattleStartTask(B_TRANSITION_GROUDON, MUS_VS_KYOGRE_GROUDON);
         break;
     case SPECIES_KYOGRE:
     case SPECIES_KYOGRE_PRIMAL:
+    case SPECIES_MIRAIDON:
         CreateBattleStartTask(B_TRANSITION_KYOGRE, MUS_VS_KYOGRE_GROUDON);
         break;
     case SPECIES_RAYQUAZA:
@@ -617,13 +619,74 @@ void BattleSetup_StartLegendaryBattle(void)
     case SPECIES_DEOXYS_SPEED:
         CreateBattleStartTask(B_TRANSITION_BLUR, MUS_RG_VS_DEOXYS);
         break;
+    case SPECIES_JIRACHI:
+    case SPECIES_HEATRAN:
+    case SPECIES_CRESSELIA:
+    case SPECIES_MANAPHY:
+    case SPECIES_XERNEAS:
+    case SPECIES_YVELTAL:
+    case SPECIES_MARSHADOW:
+    case SPECIES_ZACIAN:
+    case SPECIES_ZAMAZENTA:
+        CreateBattleStartTask(B_TRANSITION_BLACKHOLE, MUS_DP_VS_LEGEND);
+        break;
+    case SPECIES_ARTICUNO:
+    case SPECIES_ARTICUNO_GALARIAN:
+    case SPECIES_ZAPDOS:
+    case SPECIES_ZAPDOS_GALARIAN:
+    case SPECIES_MOLTRES:
+    case SPECIES_MOLTRES_GALARIAN:
     case SPECIES_LUGIA:
     case SPECIES_HO_OH:
         CreateBattleStartTask(B_TRANSITION_BLUR, MUS_RG_VS_LEGEND);
         break;
+    case SPECIES_RAIKOU:
+    case SPECIES_RAGING_BOLT:
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_HG_VS_RAIKOU);
+        break;
+    case SPECIES_ENTEI:
+    case SPECIES_GOUGING_FIRE:
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_HG_VS_ENTEI);
+        break;
+    case SPECIES_SUICUNE:
+    case SPECIES_WALKING_WAKE:
+        CreateBattleStartTask(B_TRANSITION_BLUR, MUS_HG_VS_SUICUNE);
+        break;
+    case SPECIES_MEWTWO:
+        CreateBattleStartTask(B_TRANSITION_GRID_SQUARES, MUS_RG_VS_MEWTWO);
+        break;
     case SPECIES_MEW:
         CreateBattleStartTask(B_TRANSITION_GRID_SQUARES, MUS_VS_MEW);
         break;
+    case SPECIES_CELEBI:
+        CreateBattleStartTask(B_TRANSITION_GRID_SQUARES, MUS_HG_VS_WILD);
+        break;
+    case SPECIES_UXIE:
+    case SPECIES_MESPRIT:
+    case SPECIES_AZELF:
+    case SPECIES_TORNADUS:
+    case SPECIES_THUNDURUS:
+    case SPECIES_LANDORUS:
+    case SPECIES_TAPU_KOKO:
+    case SPECIES_TAPU_LELE:
+    case SPECIES_TAPU_BULU:
+    case SPECIES_TAPU_FINI:
+    case SPECIES_ENAMORUS:
+        CreateBattleStartTask(B_TRANSITION_RECTANGULAR_SPIRAL, MUS_DP_VS_UXIE_MESPRIT_AZELF);
+        break;
+    case SPECIES_DIALGA:
+    case SPECIES_PALKIA:
+        CreateBattleStartTask(B_TRANSITION_ANGLED_WIPES, MUS_DP_VS_DIALGA_PALKIA);
+        break;
+    case SPECIES_DARKRAI:
+    case SPECIES_GIRATINA:
+    case SPECIES_GIRATINA_ORIGIN:
+    case SPECIES_HOOPA:
+    case SPECIES_HOOPA_UNBOUND:
+    case SPECIES_NECROZMA:
+        CreateBattleStartTask(B_TRANSITION_SHRED_SPLIT, MUS_PL_VS_GIRATINA);
+        break;
+		
     }
 
     IncrementGameStat(GAME_STAT_TOTAL_BATTLES);

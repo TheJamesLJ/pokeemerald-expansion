@@ -56,6 +56,7 @@
 #include "constants/union_room.h"
 #include "constants/vars.h"
 #include "constants/weather.h"
+#include "constants/day_night.h"
 	.include "asm/macros.inc"
 	.include "asm/macros/event.inc"
 	.include "constants/constants.inc"
@@ -1016,6 +1017,29 @@ EventScript_VsSeekerChargingDone::
 	special VsSeekerResetObjectMovementAfterChargeComplete
 	releaseall
 	end
+
+EventScript_DoWonderTrade::
+	special ChoosePartyMon
+	waitstate
+	compare VAR_0x8004, PARTY_SIZE
+	goto_if_ge EventScript_End
+	copyvar VAR_0x8005, VAR_0x8004
+	special CreateWonderTradePokemon
+	special DoInGameTradeScene
+	waitstate
+	msgbox EventScript_DoWonderTrade_Text_WannaDoAnotherWonderTrade, MSGBOX_YESNO
+	compare VAR_RESULT, YES
+	goto_if_eq EventScript_DoWonderTrade
+	msgbox EventScript_DoWonderTrade_Text_Done, MSGBOX_DEFAULT
+	closemessage
+EventScript_End:
+	end
+
+EventScript_DoWonderTrade_Text_WannaDoAnotherWonderTrade:
+	.string "Do you want to do\nanother Wonder Trade?$"
+
+EventScript_DoWonderTrade_Text_Done:
+	.string "Enjoy your new Pokémon.$"
 
 	.include "data/scripts/pc_transfer.inc"
 	.include "data/scripts/questionnaire.inc"

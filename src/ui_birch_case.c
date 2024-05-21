@@ -132,17 +132,17 @@ struct MonChoiceData{ // This is the format used to define a mon, everything lef
 //
 static const struct MonChoiceData sStarterChoices[9] = 
 {
-    [BALL_TOP_FIRST]        = {SPECIES_MUDKIP, 5, ITEM_POTION, BALL_NET, NATURE_JOLLY, 1, MON_MALE, {255, 255, 0, 0, 0, 0}, {31, 31, 31, 31, 31, 31}, {MOVE_FIRE_BLAST, MOVE_SHEER_COLD, MOVE_WATER_GUN, MOVE_THUNDER}, 0, 0, 0},
+    [BALL_TOP_FIRST]        = {SPECIES_MUDKIP, 5},
     [BALL_TOP_SECOND]       = {SPECIES_TREECKO, 5},
     [BALL_MIDDLE_FIRST]     = {SPECIES_TORCHIC, 5},
 
-    [BALL_TOP_THIRD]        = {SPECIES_CHIKORITA, 5},
-    [BALL_TOP_FOURTH]       = {SPECIES_NONE, 5},
-    [BALL_MIDDLE_THIRD]     = {SPECIES_CYNDAQUIL, 5},
+    [BALL_TOP_THIRD]        = {SPECIES_ROWLET, 5},
+    [BALL_TOP_FOURTH]       = {SPECIES_LITTEN, 5},
+    [BALL_MIDDLE_THIRD]     = {SPECIES_POPPLIO, 5},
 
-    [BALL_MIDDLE_SECOND]    = {SPECIES_BULBASAUR, 5},
-    [BALL_BOTTOM_FIRST]     = {SPECIES_CHARMANDER, 5},
-    [BALL_BOTTOM_SECOND]    = {SPECIES_NONE, 5},
+    [BALL_MIDDLE_SECOND]    = {SPECIES_SPRIGATITO, 5},
+    [BALL_BOTTOM_FIRST]     = {SPECIES_FUECOCO, 5},
+    [BALL_BOTTOM_SECOND]    = {SPECIES_QUAXLY, 5},
 };
 
 //==========EWRAM==========//
@@ -641,6 +641,8 @@ static void Task_BirchCaseTurnOff(u8 taskId)
     {
         SetMainCallback2(sBirchCaseDataPtr->savedCallback);
         BirchCaseFreeResources();
+        ResetAllBgsCoordinates();
+        ResetBgsAndClearDma3BusyFlags(0);
         DestroyTask(taskId);
     }
 }
@@ -853,9 +855,11 @@ static void Task_BirchCaseConfirmSelection(u8 taskId)
     if(JOY_NEW(A_BUTTON))
     {
         PlaySE(SE_SELECT);
-        PrintTextToBottomBar(RECIEVED_MON);
+        //PrintTextToBottomBar(RECIEVED_MON);
         BirchCase_GiveMon();
-        gTasks[taskId].func = Task_BirchCaseRecievedMon;
+        BeginNormalPaletteFade(0xFFFFFFFF, 0, 0, 16, RGB_BLACK);
+        gTasks[taskId].func = Task_BirchCaseTurnOff;
+        //gTasks[taskId].func = Task_BirchCaseRecievedMon;
         return;
     }
     if (JOY_NEW(B_BUTTON))

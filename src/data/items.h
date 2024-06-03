@@ -12626,4 +12626,18 @@ const struct Item gItemsInfo[] =
         .type = ITEM_USE_BAG_MENU,
         .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
     },
+
+    [ITEM_POKE_VOUCHER] =
+    {
+        .name = _("POKé Voucher"),
+        .pluralName = _("POKé Vouchers"),
+        .price = 100,
+        .description = COMPOUND_STRING(
+            "A voucher claimable\n"
+            "at any POKéMON CENTER\n"
+            "to receive a POKéMON."),
+        .pocket = POCKET_ITEMS,
+        .type = ITEM_USE_BAG_MENU,
+        .fieldUseFunc = ItemUseOutOfBattle_CannotUse,
+    },
 };

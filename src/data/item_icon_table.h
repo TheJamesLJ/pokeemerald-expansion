@@ -873,6 +873,7 @@ const u32 *const gItemIconTable[ITEMS_COUNT + 1][2] =
     [ITEM_SWAP_SNACK] = {gItemIcon_SwapSnack, gItemIconPalette_SwapSnack},
     [ITEM_TWICE_SPICED_RADISH] = {gItemIcon_TwiceSpicedRadish, gItemIconPalette_TwiceSpicedRadish},
     [ITEM_POKESHI_DOLL] = {gItemIcon_PokeshiDoll, gItemIconPalette_PokeshiDoll},
+    [ITEM_POKE_VOUCHER] = {gItemIcon_PokeVoucher, gItemIconPalette_PokeVoucher},
     // Return to field arrow
     [ITEMS_COUNT] = {gItemIcon_ReturnToFieldArrow, gItemIconPalette_ReturnToFieldArrow},
 };

@@ -460,6 +460,10 @@ void PlayCryInternal(u16 species, s8 pan, s8 volume, u8 priority, u8 mode)
     SetPokemonCryChorus(chorus);
     SetPokemonCryPriority(priority);
 
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     species = GetCryIdBySpecies(species);
     if (species != CRY_NONE)
     {

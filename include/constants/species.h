@@ -1774,4 +1774,6 @@
 #define SPECIES_ZOROARK_HISUI                           SPECIES_ZOROARK_HISUIAN
 #define SPECIES_ZORUA_HISUI                             SPECIES_ZORUA_HISUIAN
 
+#define SPECIES_MEME_OVERWRITE_ALL                      SPECIES_BIDOOF
+
 #endif  // GUARD_CONSTANTS_SPECIES_H

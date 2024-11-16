@@ -132,6 +132,11 @@ u8 GetBattlerSpriteCoord(u8 battlerId, u8 coordType)
             else
                 species = spriteInfo[battlerId].transformSpecies;
         }
+
+        #ifdef SPECIES_MEME_OVERWRITE_ALL
+            species = SPECIES_MEME_OVERWRITE_ALL;
+        #endif
+
         if (coordType == BATTLER_COORD_Y_PIC_OFFSET)
             retVal = GetBattlerSpriteFinal_Y(battlerId, species, TRUE);
         else
@@ -147,6 +152,11 @@ u8 GetBattlerYDelta(u8 battlerId, u16 species)
     u32 personality;
     struct BattleSpriteInfo *spriteInfo;
     u8 ret;
+
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+    
     species = SanitizeSpeciesId(species);
 
     if (GetBattlerSide(battlerId) == B_SIDE_PLAYER || IsContest())
@@ -196,6 +206,10 @@ u8 GetBattlerElevation(u8 battlerId, u16 species)
     {
         if (!IsContest())
         {
+            #ifdef SPECIES_MEME_OVERWRITE_ALL
+                species = SPECIES_MEME_OVERWRITE_ALL;
+            #endif
+
             species = SanitizeSpeciesId(species);
             ret = gSpeciesInfo[species].enemyMonElevation;
         }
@@ -207,6 +221,10 @@ u8 GetBattlerSpriteFinal_Y(u8 battlerId, u16 species, bool8 a3)
 {
     u16 offset;
     u8 y;
+
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
 
     if (GetBattlerSide(battlerId) == B_SIDE_PLAYER || IsContest())
     {
@@ -250,6 +268,11 @@ u8 GetBattlerSpriteCoord2(u8 battlerId, u8 coordType)
             else
                 species = spriteInfo[battlerId].transformSpecies;
         }
+
+        #ifdef SPECIES_MEME_OVERWRITE_ALL
+            species = SPECIES_MEME_OVERWRITE_ALL;
+        #endif
+
         if (coordType == BATTLER_COORD_Y_PIC_OFFSET)
             return GetBattlerSpriteFinal_Y(battlerId, species, TRUE);
         else
@@ -301,6 +324,11 @@ u8 GetBattlerYCoordWithElevation(u8 battlerId)
             else
                 species = spriteInfo[battlerId].transformSpecies;
         }
+
+        #ifdef SPECIES_MEME_OVERWRITE_ALL
+            species = SPECIES_MEME_OVERWRITE_ALL;
+        #endif
+
         if (GetBattlerSide(battlerId) != B_SIDE_PLAYER)
             y -= GetBattlerElevation(battlerId, species);
     }
@@ -1887,6 +1915,11 @@ static u16 GetBattlerYDeltaFromSpriteId(u8 spriteId)
             if (IsContest())
             {
                 species = gContestResources->moveAnim->species;
+
+                #ifdef SPECIES_MEME_OVERWRITE_ALL
+                    species = SPECIES_MEME_OVERWRITE_ALL;
+                #endif
+
                 return gSpeciesInfo[species].backPicYOffset;
             }
             else
@@ -1899,6 +1932,11 @@ static u16 GetBattlerYDeltaFromSpriteId(u8 spriteId)
                     else
                         species = spriteInfo[battlerId].transformSpecies;
 
+                    #ifdef SPECIES_MEME_OVERWRITE_ALL
+                        species = SPECIES_MEME_OVERWRITE_ALL;
+                    #endif
+
+                    species = SanitizeSpeciesId(species);
                     return gSpeciesInfo[species].backPicYOffset;
                 }
                 else
@@ -1909,6 +1947,11 @@ static u16 GetBattlerYDeltaFromSpriteId(u8 spriteId)
                     else
                         species = spriteInfo[battlerId].transformSpecies;
 
+                    #ifdef SPECIES_MEME_OVERWRITE_ALL
+                        species = SPECIES_MEME_OVERWRITE_ALL;
+                    #endif
+
+                    species = SanitizeSpeciesId(species);
                     return gSpeciesInfo[species].frontPicYOffset;
                 }
             }
@@ -2065,6 +2108,10 @@ u8 CreateAdditionalMonSpriteForMoveAnim(u16 species, bool8 isBackpic, u8 id, s16
     u16 sheet = LoadSpriteSheet(&sSpriteSheets_MoveEffectMons[id]);
     u16 palette = AllocSpritePalette(sSpriteTemplates_MoveEffectMons[id].paletteTag);
 
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     if (gMonSpritesGfxPtr != NULL && gMonSpritesGfxPtr->buffer == NULL)
         gMonSpritesGfxPtr->buffer = AllocZeroed(MON_PIC_SIZE * MAX_MON_PIC_FRAMES);
     if (!isBackpic)
@@ -2126,6 +2173,11 @@ s16 GetBattlerSpriteCoordAttr(u8 battlerId, u8 attr)
             species = gContestResources->moveAnim->species;
             personality = gContestResources->moveAnim->personality;
         }
+
+        #ifdef SPECIES_MEME_OVERWRITE_ALL
+            species = SPECIES_MEME_OVERWRITE_ALL;
+        #endif
+
         species = SanitizeSpeciesId(species);
         if (species == SPECIES_UNOWN)
             species = GetUnownSpeciesId(personality);
@@ -2147,6 +2199,10 @@ s16 GetBattlerSpriteCoordAttr(u8 battlerId, u8 attr)
                 species = spriteInfo[battlerId].transformSpecies;
                 personality = gTransformedPersonalities[battlerId];
             }
+
+            #ifdef SPECIES_MEME_OVERWRITE_ALL
+                species = SPECIES_MEME_OVERWRITE_ALL;
+            #endif
 
             species = SanitizeSpeciesId(species);
             if (species == SPECIES_UNOWN)
@@ -2171,6 +2227,10 @@ s16 GetBattlerSpriteCoordAttr(u8 battlerId, u8 attr)
                 personality = gTransformedPersonalities[battlerId];
             }
 
+            #ifdef SPECIES_MEME_OVERWRITE_ALL
+                species = SPECIES_MEME_OVERWRITE_ALL;
+            #endif
+            
             species = SanitizeSpeciesId(species);
             if (species == SPECIES_UNOWN)
                 species = GetUnownSpeciesId(personality);

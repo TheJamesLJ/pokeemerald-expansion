@@ -2713,6 +2713,10 @@ void SpriteCB_FaintOpponentMon(struct Sprite *sprite)
     else
         species = sprite->sSpeciesId;
 
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     species = SanitizeSpeciesId(species);
     if (species == SPECIES_UNOWN)
         species = GetUnownSpeciesId(personality);

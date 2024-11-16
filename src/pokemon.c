@@ -3550,6 +3550,10 @@ bool8 IsPokemonStorageFull(void)
 
 const u8 *GetSpeciesName(u16 species)
 {
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     species = SanitizeSpeciesId(species);
     if (gSpeciesInfo[species].speciesName[0] == 0)
         return gSpeciesInfo[SPECIES_NONE].speciesName;
@@ -3558,6 +3562,10 @@ const u8 *GetSpeciesName(u16 species)
 
 const u8 *GetSpeciesCategory(u16 species)
 {
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     species = SanitizeSpeciesId(species);
     if (gSpeciesInfo[species].categoryName[0] == 0)
         return gSpeciesInfo[SPECIES_NONE].categoryName;
@@ -3566,6 +3574,10 @@ const u8 *GetSpeciesCategory(u16 species)
 
 const u8 *GetSpeciesPokedexDescription(u16 species)
 {
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     species = SanitizeSpeciesId(species);
     if (gSpeciesInfo[species].description == NULL)
         return gSpeciesInfo[SPECIES_NONE].description;
@@ -3574,11 +3586,19 @@ const u8 *GetSpeciesPokedexDescription(u16 species)
 
 u16 GetSpeciesHeight(u16 species)
 {
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     return gSpeciesInfo[SanitizeSpeciesId(species)].height;
 }
 
 u16 GetSpeciesWeight(u16 species)
 {
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     return gSpeciesInfo[SanitizeSpeciesId(species)].weight;
 }
 
@@ -5818,6 +5838,10 @@ const u32 *GetMonSpritePalFromSpeciesAndPersonality(u16 species, bool32 isShiny,
 
 const u32 *GetMonSpritePalFromSpecies(u16 species, bool32 isShiny, bool32 isFemale)
 {
+    #ifdef SPECIES_MEME_OVERWRITE_ALL
+        species = SPECIES_MEME_OVERWRITE_ALL;
+    #endif
+
     species = SanitizeSpeciesId(species);
 
     if (isShiny)

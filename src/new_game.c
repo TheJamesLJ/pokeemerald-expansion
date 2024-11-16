@@ -45,6 +45,7 @@
 #include "mystery_gift.h"
 #include "union_room_chat.h"
 #include "constants/items.h"
+#include "randomizer.h"
 
 extern const u8 EventScript_ResetAllMapFlags[];
 
@@ -204,6 +205,15 @@ void NewGameInitData(void)
     WipeTrainerNameRecords();
     ResetTrainerHillResults();
     ResetContestLinkResults();
+
+    #if (RANDOMIZER_AVAILABLE == TRUE) && (RANDOMIZER_DYNAMIC_SPECIES == TRUE)
+        FlagSet(RANDOMIZER_FLAG_STARTERS);
+        FlagSet(RANDOMIZER_FLAG_WILD_MON);
+        FlagSet(RANDOMIZER_FLAG_TRAINER_MON);
+        FlagSet(RANDOMIZER_FLAG_FIXED_MON);
+        VarSet(RANDOMIZER_VAR_SPECIES_MODE, MON_RANDOM_BST);
+        PreloadRandomizationTables();
+    #endif
 }
 
 static void ResetMiniGamesRecords(void)

@@ -25,6 +25,7 @@
 #include "text.h"
 #include "constants/abilities.h"
 #include "constants/songs.h"
+#include "randomizer.h"
 
 static EWRAM_DATA u8 sLinkSendTaskId = 0;
 static EWRAM_DATA u8 sLinkReceiveTaskId = 0;
@@ -80,7 +81,17 @@ void SetUpBattleVarsAndBirchZigzagoon(void)
     if (gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE)
     {
         ZeroEnemyPartyMons();
-        CreateMon(&gEnemyParty[0], SPECIES_ZIGZAGOON, 2, USE_RANDOM_IVS, 0, 0, OT_ID_PLAYER_ID, 0);
+        u16 species = SPECIES_ZIGZAGOON;
+
+        
+
+        #if RANDOMIZER_AVAILABLE == TRUE
+            u8 mapNum = gSaveBlock1Ptr->location.mapNum;
+            u8 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+            species = RandomizeFixedEncounterMon(species, mapNum, mapGroup, 0);
+        #endif
+
+        CreateMon(&gEnemyParty[0], species, 2, USE_RANDOM_IVS, 0, 0, OT_ID_PLAYER_ID, 0);
         i = 0;
         SetMonData(&gEnemyParty[0], MON_DATA_HELD_ITEM, &i);
     }

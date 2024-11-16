@@ -69,6 +69,7 @@
 #include "constants/metatile_labels.h"
 #include "palette.h"
 #include "battle_util.h"
+#include "randomizer.h"
 
 #define TAG_ITEM_ICON 5500
 
@@ -1446,7 +1447,15 @@ void SetShoalItemFlag(u16 unused)
 void LoadWallyZigzagoon(void)
 {
     u16 monData;
-    CreateMon(&gPlayerParty[0], SPECIES_ZIGZAGOON, 7, USE_RANDOM_IVS, FALSE, 0, OT_ID_PLAYER_ID, 0);
+    u16 species = SPECIES_ZIGZAGOON;
+
+    #if RANDOMIZER_AVAILABLE == TRUE
+        u8 mapNum = gSaveBlock1Ptr->location.mapNum;
+        u8 mapGroup = gSaveBlock1Ptr->location.mapGroup;
+        species = RandomizeFixedEncounterMon(species, mapNum, mapGroup, 0);
+    #endif
+
+    CreateMon(&gPlayerParty[0], species, 7, USE_RANDOM_IVS, FALSE, 0, OT_ID_PLAYER_ID, 0);
     monData = TRUE;
     SetMonData(&gPlayerParty[0], MON_DATA_ABILITY_NUM, &monData);
     monData = MOVE_TACKLE;
